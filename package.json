@@ -1,0 +1,35 @@
+{
+  "name": "openrct2-maze-ganerator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "rollup --config rollup.config.production.js",
+    "dev": "rollup --config rollup.config.development.js --watch",
+    "typeCheck": "tsc src/index.ts --watch -noEmit"
+  },
+  "author": "beam41",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-eslint": "^9.0.3",
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "eslint": "^8.37.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.7",
+    "rollup": "^2.79.1",
+    "rollup-plugin-delete": "^2.0.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "openrct2-flexui": "^0.1.0-prerelease.11"
+  }
+}
