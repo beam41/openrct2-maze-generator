@@ -37,6 +37,16 @@ export function tileMapToMazeEntry(tileMap: number[][]): number {
   )
 }
 
+function copyMazeTile(mazeTile: number[][]) {
+  const mazeTileCpy = genMatrix(mazeTile.length, mazeTile[0].length, 0)
+  for (let x = 0; x < mazeTile.length; x++) {
+    for (let y = 0; y < mazeTile[0].length; y++) {
+      mazeTileCpy[x][y] = mazeTile[x][y]
+    }
+  }
+  return mazeTileCpy
+}
+
 export function prefillTileAfterGate(
   mazeTile: number[][],
   minX: number,
@@ -44,12 +54,7 @@ export function prefillTileAfterGate(
   entranceCoords: CoordsXYZD,
   exitCoords: CoordsXYZD,
 ): number[][] {
-  const mazeTileCpy = genMatrix(mazeTile.length, mazeTile[0].length, 0)
-  for (let x = 0; x < mazeTile.length; x++) {
-    for (let y = 0; y < mazeTile[0].length; y++) {
-      mazeTileCpy[x][y] = mazeTile[x][y]
-    }
-  }
+  const mazeTileCpy = copyMazeTile(mazeTile)
   const enterMazeCoords = getMazeTileConnectedToGate(entranceCoords)
   const exitMazeCoords = getMazeTileConnectedToGate(exitCoords)
   const prefillList = [
@@ -128,12 +133,7 @@ function directionToPosWall(x: number, y: number, dir: Direction): [number, numb
 }
 
 export function generateMaze(mazeTile: number[][]): number[][] {
-  const mazeTileCpy = genMatrix(mazeTile.length, mazeTile[0].length, 0)
-  for (let x = 0; x < mazeTile.length; x++) {
-    for (let y = 0; y < mazeTile[0].length; y++) {
-      mazeTileCpy[x][y] = mazeTile[x][y]
-    }
-  }
+  const mazeTileCpy = copyMazeTile(mazeTile)
   const stack: [number, number][] = []
   let currTile = selectStart(mazeTileCpy)
   stack.push(currTile)
