@@ -1,30 +1,55 @@
-import { window, WindowTemplate, store, spinner, twoway, button } from 'openrct2-flexui'
+import { window, WindowTemplate, button } from 'openrct2-flexui'
+import {
+  getAllValidTile,
+  getMazeTileConnectedToGate,
+  validTileToMazeGenTile,
+} from '@/src/core/generate'
+import { generateMaze, prefillTileAfterGate } from '@/src/core/maze'
+import { buildNewMaze, cleanOldMaze, convertToFullTile, restoreMaze } from '@/src/core/build'
 
 export function mainUI(): WindowTemplate {
-  const xCoord = twoway(store(126))
-  const yCoord = twoway(store(75))
-  const zCoord = twoway(store(7))
-  const generateMaze = () => {
+  const genMazeOnCLick = () => {
     const ride = map.rides.filter((v) => v.object.name === 'Maze')[0]
-    const tile = map.getTile(xCoord.twoway.get(), yCoord.twoway.get())
-    const ele = tile.getElement(1) as TrackElement
-    let entry = 0
-    for (let i = 0; i <= 16; i++) {
-      console.log(entry)
-      context.executeAction(
-        'mazeplacetrack',
-        {
-          x: xCoord.twoway.get() * 32,
-          y: (yCoord.twoway.get() - 1 - i * 2) * 32,
-          z: zCoord.twoway.get() * 16,
-          ride: ride?.id,
-          mazeEntry: entry,
-        },
-        (result) => {
-          if (result.errorTitle) console.log(result.errorTitle, result.errorMessage)
-        }
+    const cleanedMazeTile = cleanOldMaze(ride.id)
+    const [valid, minX, minY] = getAllValidTile(
+      getMazeTileConnectedToGate(ride.stations[0].entrance),
+      ride?.id,
+    )
+    let mazeTile = validTileToMazeGenTile(valid)
+    mazeTile = prefillTileAfterGate(
+      mazeTile,
+      minX,
+      minY,
+      ride.stations[0].entrance,
+      ride.stations[0].exit,
+    )
+    for (const x of mazeTile) {
+      const str = x.join(' ')
+      console.log(str)
+    }
+    mazeTile = generateMaze(mazeTile)
+    const fullTile = convertToFullTile(mazeTile)
+    const testPass = buildNewMaze(
+      ride.id,
+      fullTile,
+      minX,
+      minY,
+      ride.stations[0].entrance.z,
+      true,
+      cleanedMazeTile,
+    )
+    if (testPass) {
+      buildNewMaze(
+        ride.id,
+        fullTile,
+        minX,
+        minY,
+        ride.stations[0].entrance.z,
+        false,
+        cleanedMazeTile,
       )
-      entry += 1 << i
+    } else {
+      restoreMaze(ride.id, ride.stations[0].entrance.z, cleanedMazeTile)
     }
   }
 
@@ -38,24 +63,9 @@ export function mainUI(): WindowTemplate {
     maxHeight: 500,
     padding: 5,
     content: [
-      spinner({
-        minimum: 0,
-        value: xCoord,
-        step: 1,
-      }),
-      spinner({
-        minimum: 0,
-        value: yCoord,
-        step: 1,
-      }),
-      spinner({
-        minimum: 0,
-        value: zCoord,
-        step: 1,
-      }),
       button({
         text: 'gen',
-        onClick: generateMaze,
+        onClick: genMazeOnCLick,
       }),
     ],
   })
