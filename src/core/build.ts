@@ -46,8 +46,7 @@ export function convertToFullTile(mazeTile: number[][]) {
 
       if (x + 3 === mazeTile.length) tileMap.push(fill)
 
-      const mazeEntry = tileMapToMazeEntry(tileMap)
-      fullTile[x / 4][y / 4] = mazeEntry
+      fullTile[x / 4][y / 4] = tileMapToMazeEntry(tileMap)
     }
   }
   return fullTile
@@ -160,8 +159,8 @@ export function restoreMaze(
   rideZ: number,
   cleanedMazeTile: { [x: number]: { [y: number]: number } },
 ) {
-  for (const x of Object.keys(cleanedMazeTile) as any as number[]) {
-    for (const y of Object.keys(cleanedMazeTile[x]) as any as number[]) {
+  for (const x of Object.keys(cleanedMazeTile) as unknown as number[]) {
+    for (const y of Object.keys(cleanedMazeTile[x]) as unknown as number[]) {
       executeMazePlace(rideId, x, y, rideZ, cleanedMazeTile[x][y], false, true)
     }
   }
