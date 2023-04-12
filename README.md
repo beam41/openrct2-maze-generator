@@ -23,15 +23,21 @@ Generate Maze of any size quickly*, life is too short to do it manually.
 
 1. Partially build Maze with entrance and exit.
 
+![step1](https://raw.githubusercontent.com/beam41/openrct2-maze-ganerator/main/resources/step1.png)
+
 2. Build Perimeter around the area that you want your maze to be built, check twice for any leak.
+
+![step2](https://raw.githubusercontent.com/beam41/openrct2-maze-ganerator/main/resources/step2.png)
 
 3. Open maze generator menu and click generate.
 
 4. Now you have complete maze!
 
+![step4](https://raw.githubusercontent.com/beam41/openrct2-maze-ganerator/main/resources/step4.png)
+
 ## Thanks
 
 - [wisnia74's Typescript Modding Template](https://github.com/wisnia74/openrct2-typescript-mod-template) - My bundler of
-  choice can't bundle to es5,So I learn how to set up rollup from this template.
+  choice can't bundle to es5, So I learn how to set up rollup from this template.
 
 - [Basssiiie's FlexUI](https://github.com/Basssiiie/OpenRCT2-FlexUI) for easy to use UI library.
