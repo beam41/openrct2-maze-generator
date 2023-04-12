@@ -82,50 +82,40 @@ function executeMazePlace(
   mazeEntry: number,
   test: boolean,
   free: boolean,
-): [boolean, number] {
+): [boolean, number, string] {
+  const args = {
+    x: x * 32,
+    y: y * 32,
+    z: rideZ,
+    ride: rideId,
+    mazeEntry: mazeEntry,
+  }
   let pass = true
   let cost = 0
+  let errMsg = ''
   if (test) {
-    context.queryAction(
-      'mazeplacetrack',
-      {
-        x: x * 32,
-        y: y * 32,
-        z: rideZ,
-        ride: rideId,
-        mazeEntry: mazeEntry,
-      },
-      (result) => {
-        if (result.error) {
-          pass = false
-        }
-        if (result.cost) {
-          cost = result.cost
-        }
-      },
-    )
+    context.queryAction('mazeplacetrack', args, (result) => {
+      if (result.error) {
+        pass = false
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        errMsg = result.errorMessage!
+      }
+      if (result.cost) {
+        cost = result.cost
+      }
+    })
   } else {
-    context.executeAction(
-      'mazeplacetrack',
-      {
-        x: x * 32,
-        y: y * 32,
-        z: rideZ,
-        ride: rideId,
-        mazeEntry: mazeEntry,
-      },
-      (result) => {
-        if (result.error) {
-          pass = false
-        }
-        if (result.cost && free) {
-          park.cash += result.cost
-        }
-      },
-    )
+    context.executeAction('mazeplacetrack', args, (result) => {
+      if (result.error) {
+        pass = false
+      }
+      if (result.cost && free) {
+        park.cash += result.cost
+      }
+    })
   }
 
-  return [pass, cost]
+  return [pass, cost, errMsg]
 }
 
 export function buildNewMaze(
@@ -134,14 +124,14 @@ export function buildNewMaze(
   startX: number,
   startY: number,
   rideZ: number,
-  test: boolean,
   cleanedMazeTile: { [x: number]: { [y: number]: number } },
-): boolean {
+  test: boolean,
+): [boolean, boolean, boolean, string] {
   let sumCost = 0
   for (let x = 0; x < fullTile.length; x++) {
     for (let y = 0; y < fullTile[0].length; y++) {
       if (fullTile[x][y] !== -1) {
-        const [pass, cost] = executeMazePlace(
+        const [pass, cost, errMsg] = executeMazePlace(
           rideId,
           startX + x,
           startY + y,
@@ -151,13 +141,18 @@ export function buildNewMaze(
           !!cleanedMazeTile[startX + x]?.[startY + y],
         )
         if (!pass) {
-          return false
+          return [false, false, true, errMsg]
         }
         sumCost += cost
       }
     }
   }
-  return !(test && park.cash < sumCost)
+  return [
+    !(test && !park.getFlag('noMoney') && park.cash < sumCost),
+    park.cash < sumCost,
+    false,
+    '',
+  ]
 }
 
 export function restoreMaze(

@@ -1,5 +1,5 @@
 import { INVALID, PATH, PREBUILTPATH, WALL } from '@/src/core/reference'
-import { genMatrix, getMazeTileConnectedToGate } from '@/src/core/generate'
+import { copyMatrix, getMazeTileConnectedToGate } from '@/src/core/generate'
 
 export function mazeEntryToTileMap(mazeEntry: number): (number | null)[][] {
   const pos = Array<number>(16)
@@ -18,54 +18,38 @@ export function mazeEntryToTileMap(mazeEntry: number): (number | null)[][] {
 
 export function tileMapToMazeEntry(tileMap: number[][]): number {
   return (
-    tileMap[1][0] +
-    (tileMap[0][1] << 1) +
-    (tileMap[1][2] << 2) +
-    (tileMap[1][1] << 3) +
-    (tileMap[0][3] << 4) +
-    (tileMap[1][4] << 5) +
-    (tileMap[2][3] << 6) +
-    (tileMap[1][3] << 7) +
-    (tileMap[3][4] << 8) +
-    (tileMap[4][3] << 9) +
-    (tileMap[3][2] << 10) +
-    (tileMap[3][3] << 11) +
-    (tileMap[4][1] << 12) +
-    (tileMap[3][0] << 13) +
-    (tileMap[2][1] << 14) +
+    tileMap[1][0] |
+    (tileMap[0][1] << 1) |
+    (tileMap[1][2] << 2) |
+    (tileMap[1][1] << 3) |
+    (tileMap[0][3] << 4) |
+    (tileMap[1][4] << 5) |
+    (tileMap[2][3] << 6) |
+    (tileMap[1][3] << 7) |
+    (tileMap[3][4] << 8) |
+    (tileMap[4][3] << 9) |
+    (tileMap[3][2] << 10) |
+    (tileMap[3][3] << 11) |
+    (tileMap[4][1] << 12) |
+    (tileMap[3][0] << 13) |
+    (tileMap[2][1] << 14) |
     (tileMap[3][1] << 15)
   )
-}
-
-function copyMazeTile(mazeTile: number[][]) {
-  const mazeTileCpy = genMatrix(mazeTile.length, mazeTile[0].length, 0)
-  for (let x = 0; x < mazeTile.length; x++) {
-    for (let y = 0; y < mazeTile[0].length; y++) {
-      mazeTileCpy[x][y] = mazeTile[x][y]
-    }
-  }
-  return mazeTileCpy
 }
 
 export function prefillTileAfterGate(
   mazeTile: number[][],
   minX: number,
   minY: number,
-  entranceCoords: CoordsXYZD,
-  exitCoords: CoordsXYZD,
+  coords: CoordsXYZD[],
 ): number[][] {
-  const mazeTileCpy = copyMazeTile(mazeTile)
-  const enterMazeCoords = getMazeTileConnectedToGate(entranceCoords)
-  const exitMazeCoords = getMazeTileConnectedToGate(exitCoords)
-  const prefillList = [
-    [enterMazeCoords.x, enterMazeCoords.y, entranceCoords.direction],
-    [exitMazeCoords.x, exitMazeCoords.y, exitCoords.direction],
-  ]
+  const mazeTileCpy = copyMatrix(mazeTile)
+  for (const coord of coords) {
+    const mazeCoord = getMazeTileConnectedToGate(coord)
 
-  for (const [x, y, d] of prefillList) {
-    const posX = (x / 32 - minX) * 4
-    const posY = (y / 32 - minY) * 4
-    switch (d) {
+    const posX = (mazeCoord.x / 32 - minX) * 4
+    const posY = (mazeCoord.y / 32 - minY) * 4
+    switch (coord.direction) {
       case 0:
         mazeTileCpy[posX + 2][posY] = PREBUILTPATH
         mazeTileCpy[posX + 2][posY + 1] = PREBUILTPATH
@@ -104,8 +88,6 @@ function selectStart(mazeTile: number[][]): [number, number] {
   return start
 }
 
-const Direction = 0 | 1 | 2 | 3
-
 function directionToPos(x: number, y: number, dir: Direction): [number, number] {
   switch (dir) {
     case 0:
@@ -133,7 +115,7 @@ function directionToPosWall(x: number, y: number, dir: Direction): [number, numb
 }
 
 export function generateMaze(mazeTile: number[][]): number[][] {
-  const mazeTileCpy = copyMazeTile(mazeTile)
+  const mazeTileCpy = copyMatrix(mazeTile)
   const stack: [number, number][] = []
   let currTile = selectStart(mazeTileCpy)
   stack.push(currTile)
@@ -142,16 +124,16 @@ export function generateMaze(mazeTile: number[][]): number[][] {
 
     if (mazeTileCpy[currX][currY] === PREBUILTPATH) {
       mazeTileCpy[currX][currY] = PATH
-      if (mazeTileCpy[currX + 2][currY] === PREBUILTPATH) {
+      if (mazeTileCpy[currX + 2]?.[currY] === PREBUILTPATH) {
         mazeTileCpy[currX + 1][currY] = PATH
         currX = currX + 2
-      } else if (mazeTileCpy[currX - 2][currY] === PREBUILTPATH) {
+      } else if (mazeTileCpy[currX - 2]?.[currY] === PREBUILTPATH) {
         mazeTileCpy[currX - 1][currY] = PATH
         currX = currX - 2
-      } else if (mazeTileCpy[currX][currY + 2] === PREBUILTPATH) {
+      } else if (mazeTileCpy[currX]?.[currY + 2] === PREBUILTPATH) {
         mazeTileCpy[currX][currY + 1] = PATH
         currY = currY + 2
-      } else if (mazeTileCpy[currX][currY - 2] === PREBUILTPATH) {
+      } else if (mazeTileCpy[currX]?.[currY - 2] === PREBUILTPATH) {
         mazeTileCpy[currX][currY - 1] = PATH
         currY = currY - 2
       }
@@ -175,4 +157,33 @@ export function generateMaze(mazeTile: number[][]): number[][] {
     currTile = stack.pop()!
   }
   return mazeTileCpy
+}
+
+export function removeWallNextToGate(
+  fullTile: number[][],
+  minX: number,
+  minY: number,
+  coords: CoordsXYZD[],
+): number[][] {
+  const fullTileCpy = copyMatrix(fullTile)
+  for (const coord of coords) {
+    const mazeCoord = getMazeTileConnectedToGate(coord)
+    const posX = mazeCoord.x / 32 - minX
+    const posY = mazeCoord.y / 32 - minY
+    switch (coord.direction) {
+      case 0:
+        fullTileCpy[posX][posY] ^= (1 << 9) | (1 << 12)
+        break
+      case 1:
+        fullTileCpy[posX][posY] ^= 1 | (1 << 13)
+        break
+      case 2:
+        fullTileCpy[posX][posY] ^= (1 << 1) | (1 << 4)
+        break
+      case 3:
+        fullTileCpy[posX][posY] ^= (1 << 5) | (1 << 8)
+        break
+    }
+  }
+  return fullTileCpy
 }

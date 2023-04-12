@@ -12,6 +12,16 @@ export function genMatrix<T>(xSize: number, ySize: number, initialValue: T): T[]
   return matX
 }
 
+export function copyMatrix<T>(matrix: T[][]): T[][] {
+  const matrixCpy = genMatrix(matrix.length, matrix[0].length, matrix[0][0])
+  for (let x = 0; x < matrix.length; x++) {
+    for (let y = 0; y < matrix[0].length; y++) {
+      matrixCpy[x][y] = matrix[x][y]
+    }
+  }
+  return matrixCpy
+}
+
 export function validTileToMazeGenTile(validTile: boolean[][]): number[][] {
   const mazeTile = genMatrix(validTile.length * 4 - 1, validTile[0].length * 4 - 1, WALL)
   for (let x = 0; x < validTile.length; x++) {

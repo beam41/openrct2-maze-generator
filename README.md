@@ -1,6 +1,8 @@
 # OpenRCT2 Maze Generator
 
+Generate Maze of any size quickly*, life is too short to do it manually.
 
+\* *Testing on Ryzen 7700x took around 1 second for 150×150 maze and 1.3 minute for 999×999 maze*
 
 ## Installation
 
@@ -14,6 +16,18 @@
 - If you already had this plugin installed before, you can safely overwrite the old file.
 
 3. Once the file is there, it should show up ingame in the dropdown menu under the map icon.
+
+## Usage
+
+0. You might want to backup first.
+
+1. Partially build Maze with entrance and exit.
+
+2. Build Perimeter around the area that you want your maze to be built, check twice for any leak.
+
+3. Open maze generator menu and click generate.
+
+4. Now you have complete maze!
 
 ## Thanks
 
