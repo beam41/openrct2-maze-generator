@@ -27,7 +27,7 @@ export function mainUI(): WindowTemplate {
   }
 
   const genMazeOnCLick = () => {
-    const t0 = performance.now()
+    // const t0 = performance.now()
     const ride = mazeList.get()[selectingIndex.twoway.get()]
     if (!ride) {
       ui.showError('Cannot Build', 'Maze not found.')
@@ -74,8 +74,8 @@ export function mainUI(): WindowTemplate {
       restoreMaze(ride.id, entrance.z, cleanedMazeTile)
       ui.showError('Cannot Build', 'Unknown Error')
     } finally {
-      const t1 = performance.now()
-      console.log(`Maze Generator took ${t1 - t0} milliseconds.`)
+      // const t1 = performance.now()
+      // console.log(`Maze Generator took ${t1 - t0} milliseconds.`)
     }
   }
 
