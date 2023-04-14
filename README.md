@@ -7,7 +7,7 @@ Generate Maze of any size quickly*, life is too short to do it manually.
 ## Installation
 
 1. Download the latest version of the plugin from
-   the [Releases page](https://github.com/beam41/openrct2-maze-generator/releases/tag/v0.1).
+   the [Releases page](https://github.com/beam41/openrct2-maze-generator/releases/tag/latest).
 2. To install it, put the downloaded `*.js` file into your `/OpenRCT2/plugin` folder.
 
 - Easiest way to find the OpenRCT2-folder is by launching the OpenRCT2 game, click and hold on the red toolbox in the
