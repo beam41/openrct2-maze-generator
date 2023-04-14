@@ -59,7 +59,7 @@ export function cleanOldMaze(rideId: number): { [x: number]: { [y: number]: numb
       const tileEles = map.getTile(x, y).elements
       for (let i = 0; i < tileEles.length; i++) {
         const ele = tileEles[i]
-        if (ele.type === 'track' && ele.mazeEntry !== null && ele.ride === rideId) {
+        if (ele.type === 'track' && ele.ride === rideId && ele.mazeEntry !== null) {
           map.getTile(x, y).removeElement(i)
           if (removedTile[x]) {
             removedTile[x][y] = ele.mazeEntry
