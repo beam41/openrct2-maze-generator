@@ -21,7 +21,7 @@ export function mainUI(): WindowTemplate {
   const mazeNameList = store<string[]>([])
   const selectingIndex = twoway(store(0))
   const fetchMaze = () => {
-    const rides = map.rides.filter((v) => v.object.name === 'Maze')
+    const rides = map.rides.filter((v) => v.type === 20)
     mazeList.set(rides)
     mazeNameList.set(rides.map((r) => r.name))
   }
