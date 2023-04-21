@@ -1,5 +1,5 @@
 import { INVALID, PATH, PREBUILTPATH, WALL } from '@/src/core/reference'
-import { copyMatrix, getMazeTileConnectedToGate } from '@/src/core/generate'
+import { getMazeTileConnectedToGate } from '@/src/core/generate'
 
 export function mazeEntryToTileMap(mazeEntry: number): (number | null)[][] {
   const pos = Array<number>(16)
@@ -42,38 +42,34 @@ export function prefillTileAfterGate(
   minX: number,
   minY: number,
   coords: CoordsXYZD[],
-): number[][] {
-  const mazeTileCpy = copyMatrix(mazeTile)
+) {
   for (const coord of coords) {
     const mazeCoord = getMazeTileConnectedToGate(coord)
-
     const posX = (mazeCoord.x / 32 - minX) * 4
     const posY = (mazeCoord.y / 32 - minY) * 4
     switch (coord.direction) {
       case 0:
-        mazeTileCpy[posX + 2][posY] = PREBUILTPATH
-        mazeTileCpy[posX + 2][posY + 1] = PREBUILTPATH
-        mazeTileCpy[posX + 2][posY + 2] = PREBUILTPATH
+        mazeTile[posX + 2][posY] = PREBUILTPATH
+        mazeTile[posX + 2][posY + 1] = PREBUILTPATH
+        mazeTile[posX + 2][posY + 2] = PREBUILTPATH
         break
       case 1:
-        mazeTileCpy[posX][posY] = PREBUILTPATH
-        mazeTileCpy[posX + 1][posY] = PREBUILTPATH
-        mazeTileCpy[posX + 2][posY] = PREBUILTPATH
+        mazeTile[posX][posY] = PREBUILTPATH
+        mazeTile[posX + 1][posY] = PREBUILTPATH
+        mazeTile[posX + 2][posY] = PREBUILTPATH
         break
       case 2:
-        mazeTileCpy[posX][posY] = PREBUILTPATH
-        mazeTileCpy[posX][posY + 1] = PREBUILTPATH
-        mazeTileCpy[posX][posY + 2] = PREBUILTPATH
+        mazeTile[posX][posY] = PREBUILTPATH
+        mazeTile[posX][posY + 1] = PREBUILTPATH
+        mazeTile[posX][posY + 2] = PREBUILTPATH
         break
       case 3:
-        mazeTileCpy[posX][posY + 2] = PREBUILTPATH
-        mazeTileCpy[posX + 1][posY + 2] = PREBUILTPATH
-        mazeTileCpy[posX + 2][posY + 2] = PREBUILTPATH
+        mazeTile[posX][posY + 2] = PREBUILTPATH
+        mazeTile[posX + 1][posY + 2] = PREBUILTPATH
+        mazeTile[posX + 2][posY + 2] = PREBUILTPATH
         break
     }
   }
-
-  return mazeTileCpy
 }
 
 function selectStart(mazeTile: number[][]): [number, number] {
@@ -88,75 +84,87 @@ function selectStart(mazeTile: number[][]): [number, number] {
   return start
 }
 
-function directionToPos(x: number, y: number, dir: Direction): [number, number] {
-  switch (dir) {
-    case 0:
-      return [x + 2, y]
-    case 1:
-      return [x - 2, y]
-    case 2:
-      return [x, y + 2]
-    case 3:
-      return [x, y - 2]
-  }
-}
-
-function directionToPosWall(x: number, y: number, dir: Direction): [number, number] {
-  switch (dir) {
-    case 0:
-      return [x + 1, y]
-    case 1:
-      return [x - 1, y]
-    case 2:
-      return [x, y + 1]
-    case 3:
-      return [x, y - 1]
-  }
-}
-
-export function generateMaze(mazeTile: number[][]): number[][] {
-  const mazeTileCpy = copyMatrix(mazeTile)
+export function generateMaze(mazeTile: number[][]) {
   const stack: [number, number][] = []
-  let currTile = selectStart(mazeTileCpy)
+  let currTile = selectStart(mazeTile)
   stack.push(currTile)
-  loopTile: while (stack.length > 0) {
+  while (stack.length > 0) {
     let [currX, currY] = currTile
 
-    if (mazeTileCpy[currX][currY] === PREBUILTPATH) {
-      mazeTileCpy[currX][currY] = PATH
-      if (mazeTileCpy[currX + 2]?.[currY] === PREBUILTPATH) {
-        mazeTileCpy[currX + 1][currY] = PATH
+    if (mazeTile[currX][currY] === PREBUILTPATH) {
+      mazeTile[currX][currY] = PATH
+      if (mazeTile[currX + 2]?.[currY] === PREBUILTPATH) {
+        mazeTile[currX + 1][currY] = PATH
         currX = currX + 2
-      } else if (mazeTileCpy[currX - 2]?.[currY] === PREBUILTPATH) {
-        mazeTileCpy[currX - 1][currY] = PATH
+      } else if (mazeTile[currX - 2]?.[currY] === PREBUILTPATH) {
+        mazeTile[currX - 1][currY] = PATH
         currX = currX - 2
-      } else if (mazeTileCpy[currX]?.[currY + 2] === PREBUILTPATH) {
-        mazeTileCpy[currX][currY + 1] = PATH
+      } else if (mazeTile[currX]?.[currY + 2] === PREBUILTPATH) {
+        mazeTile[currX][currY + 1] = PATH
         currY = currY + 2
-      } else if (mazeTileCpy[currX]?.[currY - 2] === PREBUILTPATH) {
-        mazeTileCpy[currX][currY - 1] = PATH
+      } else if (mazeTile[currX]?.[currY - 2] === PREBUILTPATH) {
+        mazeTile[currX][currY - 1] = PATH
         currY = currY - 2
       }
     }
 
-    mazeTileCpy[currX][currY] = PATH
+    mazeTile[currX][currY] = PATH
 
-    const directions: Direction[] = [0, 1, 2, 3]
-    while (directions.length > 0) {
-      const dir = directions.splice(Math.trunc(Math.random() * directions.length), 1)[0]
-      const [nextX, nextY] = directionToPos(currX, currY, dir)
-      if (mazeTileCpy[nextX]?.[nextY] === WALL || mazeTileCpy[nextX]?.[nextY] === PREBUILTPATH) {
-        const [wallX, wallY] = directionToPosWall(currX, currY, dir)
-        mazeTileCpy[wallX][wallY] = PATH
-        currTile = [nextX, nextY]
-        stack.push(currTile)
-        continue loopTile
+    const validNext: [number, number, Direction][] = []
+    for (let dir = 0; dir <= 3; dir++) {
+      let nextX: number, nextY: number
+      switch (dir as Direction) {
+        case 0:
+          nextX = currX + 2
+          nextY = currY
+          break
+        case 1:
+          nextX = currX - 2
+          nextY = currY
+          break
+        case 2:
+          nextX = currX
+          nextY = currY + 2
+          break
+        case 3:
+          nextX = currX
+          nextY = currY - 2
+          break
       }
+      if (mazeTile[nextX]?.[nextY] === WALL || mazeTile[nextX]?.[nextY] === PREBUILTPATH) {
+        validNext.push([nextX, nextY, dir as Direction])
+      }
+    }
+
+    if (validNext.length > 0) {
+      const [nextX, nextY, dir] = validNext[Math.trunc(Math.random() * validNext.length)]
+      let wallX: number, wallY: number
+      switch (dir) {
+        case 0:
+          wallX = currX + 1
+          wallY = currY
+          break
+        case 1:
+          wallX = currX - 1
+          wallY = currY
+          break
+        case 2:
+          wallX = currX
+          wallY = currY + 1
+          break
+        case 3:
+          wallX = currX
+          wallY = currY - 1
+          break
+      }
+      mazeTile[wallX][wallY] = PATH
+      currTile = [nextX, nextY]
+      stack.push(currTile)
+      continue
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     currTile = stack.pop()!
   }
-  return mazeTileCpy
 }
 
 export function removeWallNextToGate(
@@ -164,26 +172,25 @@ export function removeWallNextToGate(
   minX: number,
   minY: number,
   coords: CoordsXYZD[],
-): number[][] {
-  const fullTileCpy = copyMatrix(fullTile)
+) {
   for (const coord of coords) {
     const mazeCoord = getMazeTileConnectedToGate(coord)
     const posX = mazeCoord.x / 32 - minX
     const posY = mazeCoord.y / 32 - minY
     switch (coord.direction) {
       case 0:
-        fullTileCpy[posX][posY] ^= (1 << 9) | (1 << 12)
+        fullTile[posX][posY] ^= (1 << 9) | (1 << 12)
         break
       case 1:
-        fullTileCpy[posX][posY] ^= 1 | (1 << 13)
+        fullTile[posX][posY] ^= 1 | (1 << 13)
         break
       case 2:
-        fullTileCpy[posX][posY] ^= (1 << 1) | (1 << 4)
+        fullTile[posX][posY] ^= (1 << 1) | (1 << 4)
         break
       case 3:
-        fullTileCpy[posX][posY] ^= (1 << 5) | (1 << 8)
+        fullTile[posX][posY] ^= (1 << 5) | (1 << 8)
         break
     }
   }
-  return fullTileCpy
+  return fullTile
 }

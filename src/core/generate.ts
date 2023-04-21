@@ -13,13 +13,7 @@ export function genMatrix<T>(xSize: number, ySize: number, initialValue: T): T[]
 }
 
 export function copyMatrix<T>(matrix: T[][]): T[][] {
-  const matrixCpy = genMatrix(matrix.length, matrix[0].length, matrix[0][0])
-  for (let x = 0; x < matrix.length; x++) {
-    for (let y = 0; y < matrix[0].length; y++) {
-      matrixCpy[x][y] = matrix[x][y]
-    }
-  }
-  return matrixCpy
+  return matrix.map((arr) => arr.slice())
 }
 
 export function validTileToMazeGenTile(validTile: boolean[][]): number[][] {
@@ -100,6 +94,10 @@ export function getAllValidTile(
   const visited: boolean[][] = genMatrix(map.size.x, map.size.y, false)
   const valid: boolean[][] = genMatrix(map.size.x, map.size.y, false)
 
+  let validMinX = Infinity
+  let validMaxX = 0
+  let validMinY = Infinity
+  let validMaxY = 0
   let first = true
   const stack: [number, number][] = []
   stack.push([startTile.x / 32, startTile.y / 32])
@@ -112,34 +110,16 @@ export function getAllValidTile(
 
     if (!first && !checkValidTile(x * 32, y * 32, startTile.z, rideId)) continue
     valid[x][y] = true
+    validMinX = Math.min(validMinX, x)
+    validMaxX = Math.max(validMaxX, x)
+    validMinY = Math.min(validMinY, y)
+    validMaxY = Math.max(validMaxY, y)
     first = false
 
-    stack.push([x + 1, y])
-    stack.push([x - 1, y])
-    stack.push([x, y + 1])
-    stack.push([x, y - 1])
+    stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1])
   }
-  const newValid = []
-  let minX = Infinity
-  let minY = Infinity
-  let maxY = 0
-  for (let x = 0; x < valid.length; x++) {
-    let hasValid = false
-    for (let y = 0; y < valid[x].length; y++) {
-      if (valid[x][y]) {
-        hasValid = true
-        minX = Math.min(minX, x)
-        minY = Math.min(minY, y)
-        maxY = Math.max(maxY, y)
-      }
-    }
-    if (hasValid) {
-      newValid.push(valid[x])
-    }
-  }
-  const newValidTrimY = []
-  for (let x = 0; x < newValid.length; x++) {
-    newValidTrimY.push(newValid[x].slice(minY, maxY + 1))
-  }
-  return [newValidTrimY, minX, minY]
+  const newValid = valid
+    .slice(validMinX, validMaxX + 1)
+    .map((arr) => arr.slice(validMinY, validMaxY + 1))
+  return [newValid, validMinX, validMinY]
 }

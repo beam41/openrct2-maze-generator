@@ -16,7 +16,7 @@ export default defineConfig({
       'documents',
       'OpenRCT2',
       'plugin',
-      'maze-generator.js'
+      'maze-generator.js',
     ),
     format: 'iife',
   },
@@ -30,6 +30,7 @@ export default defineConfig({
         negate_iife: false,
       },
       format: {
+        beautify: true,
         quote_style: 1,
         wrap_iife: true,
       },
