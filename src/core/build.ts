@@ -12,39 +12,24 @@ export function convertToFullTile(mazeTile: number[][]) {
         fullTile[x / 4][y / 4] = -1
         continue
       }
-      const tileMap = []
-      let ixx = -1
-      let xxMax = 3
-      let iyy = -1
-      let yyMax = 3
-      if (x === 0) {
-        tileMap.push(fill)
-        ixx = 0
-      }
-      if (x + 3 === mazeTile.length) {
-        xxMax = 2
-      }
-      if (y === 0) {
-        iyy = 0
-      }
-      if (y + 3 === mazeTile[x].length) {
-        yyMax = 2
-      }
-      for (let xx = ixx; xx <= xxMax; xx++) {
-        const row = []
-        if (y === 0) {
-          row.push(1)
+      const xOnEdge = x + 3 === mazeTile.length
+      const yOnEdge = y + 3 === mazeTile[x].length
+      const tileMap = [
+        x === 0 ? fill : [0, 0, 0, 0, 0],
+        [y === 0 ? 1 : 0, 0, 0, 0, yOnEdge ? 1 : 0],
+        [y === 0 ? 1 : 0, 0, 0, 0, yOnEdge ? 1 : 0],
+        [y === 0 ? 1 : 0, 0, 0, 0, yOnEdge ? 1 : 0],
+        xOnEdge ? fill : [y === 0 ? 1 : 0, 0, 0, 0, yOnEdge ? 1 : 0],
+      ]
+      const ixx = x === 0 ? 0 : -1
+      const xxMax = xOnEdge ? 2 : 3
+      const iyy = y === 0 ? 0 : -1
+      const yyMax = yOnEdge ? 2 : 3
+      for (let xx = ixx, xTile = 1 + ixx; xx <= xxMax; xx++, xTile++) {
+        for (let yy = iyy, yTile = 1 + iyy; yy <= yyMax; yy++, yTile++) {
+          tileMap[xTile][yTile] = mazeTile[x + xx][y + yy] === PATH ? 0 : 1
         }
-        for (let yy = iyy; yy <= yyMax; yy++) {
-          row.push(mazeTile[x + xx][y + yy] === PATH ? 0 : 1)
-        }
-        if (y + 3 === mazeTile[x].length) {
-          row.push(1)
-        }
-        tileMap.push(row)
       }
-
-      if (x + 3 === mazeTile.length) tileMap.push(fill)
 
       fullTile[x / 4][y / 4] = tileMapToMazeEntry(tileMap)
     }

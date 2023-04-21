@@ -27,7 +27,6 @@ export function mainUI(): WindowTemplate {
   }
 
   const genMazeOnCLick = () => {
-    // const t0 = performance.now()
     const ride = mazeList.get()[selectingIndex.twoway.get()]
     if (!ride) {
       ui.showError('Cannot Build', 'Maze not found.')
@@ -43,12 +42,14 @@ export function mainUI(): WindowTemplate {
       ui.showError('Cannot Build', 'Exit not found.')
       return
     }
+    console.time('whole')
     const cleanedMazeTile = cleanOldMaze(ride.id)
+
     try {
       const [valid, minX, minY] = getAllValidTile(getMazeTileConnectedToGate(entrance), ride?.id)
-      let mazeTile = validTileToMazeGenTile(valid)
-      mazeTile = prefillTileAfterGate(mazeTile, minX, minY, [entrance, exit])
-      mazeTile = generateMaze(mazeTile)
+      const mazeTile = validTileToMazeGenTile(valid)
+      prefillTileAfterGate(mazeTile, minX, minY, [entrance, exit])
+      generateMaze(mazeTile)
       let fullTile = convertToFullTile(mazeTile)
       fullTile = removeWallNextToGate(fullTile, minX, minY, [entrance, exit])
       const [testPass, errCost, errBuild, errBuildMsg] = buildNewMaze(
@@ -70,12 +71,11 @@ export function mainUI(): WindowTemplate {
         )
       }
     } catch (e) {
-      console.error((e as Error).message, (e as Error).stack)
+      console.log((e as Error).message, (e as Error).stack)
       restoreMaze(ride.id, entrance.z, cleanedMazeTile)
       ui.showError('Cannot Build', 'Unknown Error')
     } finally {
-      // const t1 = performance.now()
-      // console.log(`Maze Generator took ${t1 - t0} milliseconds.`)
+      console.timeEnd('whole')
     }
   }
 
