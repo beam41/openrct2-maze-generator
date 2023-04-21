@@ -42,7 +42,7 @@ export function mainUI(): WindowTemplate {
       ui.showError('Cannot Build', 'Exit not found.')
       return
     }
-    console.time('whole')
+    // console.time('whole')
     const cleanedMazeTile = cleanOldMaze(ride.id)
 
     try {
@@ -75,7 +75,7 @@ export function mainUI(): WindowTemplate {
       restoreMaze(ride.id, entrance.z, cleanedMazeTile)
       ui.showError('Cannot Build', 'Unknown Error')
     } finally {
-      console.timeEnd('whole')
+      // console.timeEnd('whole')
     }
   }
 

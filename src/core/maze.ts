@@ -1,5 +1,5 @@
 import { INVALID, PATH, PREBUILTPATH, WALL } from '@/src/core/reference'
-import { copyMatrix, getMazeTileConnectedToGate } from '@/src/core/generate'
+import { getMazeTileConnectedToGate } from '@/src/core/generate'
 
 export function mazeEntryToTileMap(mazeEntry: number): (number | null)[][] {
   const pos = Array<number>(16)
