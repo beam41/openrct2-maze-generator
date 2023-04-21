@@ -50,8 +50,8 @@ export function mainUI(): WindowTemplate {
       const mazeTile = validTileToMazeGenTile(valid)
       prefillTileAfterGate(mazeTile, minX, minY, [entrance, exit])
       generateMaze(mazeTile)
-      let fullTile = convertToFullTile(mazeTile)
-      fullTile = removeWallNextToGate(fullTile, minX, minY, [entrance, exit])
+      const fullTile = convertToFullTile(mazeTile)
+      removeWallNextToGate(fullTile, minX, minY, [entrance, exit])
       const [testPass, errCost, errBuild, errBuildMsg] = buildNewMaze(
         ride.id,
         fullTile,

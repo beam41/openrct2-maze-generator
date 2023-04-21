@@ -192,5 +192,4 @@ export function removeWallNextToGate(
         break
     }
   }
-  return fullTile
 }
